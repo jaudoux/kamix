@@ -54,7 +54,7 @@ Consider using the sort command with `-S {resources.ram}G` and `--parallel {thre
 
 **Join counts from multiple libraries with joinCounts**
 
-Download and install [joinCounts]('https://github.com/Transipedia/dekupl-joinCounts'), to join counts files generated for each libraries.
+Download and install [joinCounts](https://github.com/Transipedia/dekupl-joinCounts), to join counts files generated for each libraries.
 
 ```
 joinCounts counts1.tsv counts2.tsv > counts-matrix.tsv
@@ -62,4 +62,4 @@ joinCounts counts1.tsv counts2.tsv > counts-matrix.tsv
 
 ## Credit
 
-kamix is derived from [grabix]('https://github.com/arq5x/grabix') that uses BGZF library.
+kamix is derived from [grabix](https://github.com/arq5x/grabix) that uses BGZF library.
