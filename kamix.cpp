@@ -273,7 +273,7 @@ int get_kmer(string bgzf_file, char *kmer)
     while (kmer_int < kmer_query)
     {
       status = bgzf_getline(bgzf_fp, '\n', line);
-      strcpy(tempstr, line->s);
+      strncpy(tempstr, line->s, 32);
       kmer_tmp = strtok(tempstr,"\t");
       kmer_int = str_to_int(kmer_tmp,strlen(kmer_tmp));
     }
