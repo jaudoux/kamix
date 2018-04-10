@@ -9,7 +9,7 @@ Kamix expect k-mer matrices compressed with bgzip. In this matrice, k-mer must b
 Example :
 
 ```
-AAAAAATGTTTTGTAAGAAT  3	7	4	0	3	0	0	8	0	5	0	6
+AAAAAATGTTTTGTAAGAAT	3	7	4	0	3	0	0	8	0	5	0	6
 AAAAAATGTTTTGTAAGGAC	3	0	0	0	0	0	0	0	0	0	0	0
 AAAAAATGTTTTGTAATTGA	5	5	5	7	3	8	4	5	6	0	3	9
 AAAAAATGTTTTGTACAAAA	8	6	6	4	5	0	6	6	7	0	6	4
