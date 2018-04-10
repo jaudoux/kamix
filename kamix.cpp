@@ -72,6 +72,7 @@ random access via the BGZF seek utility
 */
 int create_kamix_index(string bgzf_file)
 {
+
   if (!bgzf_is_bgzf(bgzf_file.c_str()))
   {
     cerr << "[kamix] " << bgzf_file << " doesn't exist or wasn't compressed with bgzip" << endl;
@@ -94,7 +95,8 @@ int create_kamix_index(string bgzf_file)
   int status;
   kstring_t *line = new kstring_t;
   char *kmer;
-  line->s = '\0';
+  line->s = (char*)malloc(sizeof(char));
+  line->s[0] = '\0';
   line->l = 0;
   line->m = 0;
 
@@ -143,7 +145,6 @@ int create_kamix_index(string bgzf_file)
     else if (chunk_count == CHUNK_SIZE)
     {
       kmer = strtok(line->s,"\t");
-      cerr << kmer << endl;
       chunk.offset = prev_offset;
       chunk.kmer = str_to_int(kmer,strlen(kmer));
       chunk_positions.push_back(chunk);
@@ -194,20 +195,10 @@ void load_index(string bgzf_file, index_info &index)
 
     while (index_file >> line)
     {
-      // char *tmp = (char*)malloc(sizeof(char) * line.length());
-      // strcpy(tmp, line.c_str());
-      // tmp = strtok(tmp, "\t");
-      // chunk.offset = atol(tmp);
-      // tmp = strtok(tmp, "\t");
-      // chunk.kmer = atol(tmp);
-      // cerr << "line " << line << endl;
-      // cerr << chunk.offset << "\t" << chunk.kmer << endl;
-
       chunk.offset = atol(line.c_str());
       index_file >> line;
       chunk.kmer = atol(line.c_str());
       index.chunk_offsets.push_back(chunk);
-      //free(tmp);
     }
   }
   index_file.close();
@@ -216,6 +207,8 @@ void load_index(string bgzf_file, index_info &index)
 int get_kmer(string bgzf_file, char *kmer)
 {
   index_info index;
+  //cerr << "Loading index" << endl;
+
   load_index(bgzf_file, index);
   uint64_t kmer_query = str_to_int(kmer,strlen(kmer));
 
@@ -234,7 +227,8 @@ int get_kmer(string bgzf_file, char *kmer)
   kstring_t *line = new kstring_t;
   char *kmer_tmp;
   uint64_t kmer_int = 0;
-  line->s = '\0';
+  line->s = (char*)malloc(sizeof(char));
+  line->s[0] = '\0';
   line->l = 0;
   line->m = 0;
 
@@ -250,13 +244,11 @@ int get_kmer(string bgzf_file, char *kmer)
   int min = 0;
   int max = index.chunk_offsets.size() - 1; // Max
 
-  //int a = 0, b = index.chunk_offsets.size();
-  //while(i > 0 && i < index.chunk_offsets.size() - 1) {
-  fprintf(stderr, "dichotomy search\n");
+  //fprintf(stderr, "dichotomy search\n");
   while(max > min) {
     i = min + (max - min) / 2; // minddle
-    cerr << "min: " << min << " max: " << max << " i: " << i << endl;
-    cerr << "kmer_query: " << kmer_query << " kmer chunk: " << index.chunk_offsets[i].kmer << endl;
+    //cerr << "min: " << min << " max: " << max << " i: " << i << endl;
+    //cerr << "kmer_query: " << kmer_query << " kmer chunk: " << index.chunk_offsets[i].kmer << endl;
     // We go up
     if(index.chunk_offsets[i].kmer > kmer_query) {
       max = i - 1;
@@ -270,27 +262,21 @@ int get_kmer(string bgzf_file, char *kmer)
   }
 
   // We found the right interval
-  fprintf(stderr, "Looking into chunk\n");
+  //fprintf(stderr, "Looking into chunk\n");
   char* tempstr = (char*)malloc(sizeof(char) * 33);
   if(max >= min) {
     bgzf_seek (bgzf_fp, index.chunk_offsets[i].offset, SEEK_SET);
     while (kmer_int < kmer_query)
     {
       status = bgzf_getline(bgzf_fp, '\n', line);
-      /*fprintf(stderr, "%s\n", line->s);*/
-      // char* tempstr = (char*)malloc(sizeof(char) * strlen(line->s));
       strcpy(tempstr, line->s);
       kmer_tmp = strtok(tempstr,"\t");
       kmer_int = str_to_int(kmer_tmp,strlen(kmer_tmp));
-
-      // free(tempstr);
     }
     if(kmer_int == kmer_query) {
       printf("%s\n", line->s);
-      // free(tempstr);
-      // break;
     } else if(kmer_int > kmer_query) {
-      printf("kmer not found\n");
+      printf("kmer %s not found\n", kmer);
     }
   }
   return 0;
@@ -335,7 +321,8 @@ int grab(string bgzf_file, uint64_t from_line, uint64_t to_line)
     // dump the header if there is one
     int status;
     kstring_t *line = new kstring_t;
-    line->s = '\0';
+    line->s = (char*)malloc(sizeof(char));
+    line->s[0] = '\0';
     line->l = 0;
     line->m = 0;
 
@@ -407,7 +394,8 @@ int random(string bgzf_file, uint64_t K)
     vector<string> sample;
     int status;
     kstring_t *line = new kstring_t;
-    line->s = '\0';
+    line->s = (char*)malloc(sizeof(char));
+    line->s[0] = '\0';
     line->l = 0;
     line->m = 0;
 
