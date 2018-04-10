@@ -250,9 +250,6 @@ int get_kmer(string bgzf_file, char *kmer)
 
   //fprintf(stderr, "dichotomy search\n");
   while(max > min) {
-    i = min + (max - min) / 2; // minddle
-    //cerr << "min: " << min << " max: " << max << " i: " << i << endl;
-    //cerr << "kmer_query: " << kmer_query << " kmer chunk: " << index.chunk_offsets[i].kmer << endl;
     // We go up
     if(index.chunk_offsets[i].kmer > kmer_query) {
       max = i - 1;
@@ -263,10 +260,10 @@ int get_kmer(string bgzf_file, char *kmer)
     } else {
       break;
     }
+    i = min + (max - min) / 2; // minddle
   }
 
   // We found the right interval
-  //fprintf(stderr, "Looking into chunk\n");
   char* tempstr = (char*)malloc(sizeof(char) * 33);
   if(max >= min) {
     bgzf_seek (bgzf_fp, index.chunk_offsets[i].offset, SEEK_SET);
