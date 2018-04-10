@@ -5,7 +5,7 @@
 using namespace std;
 
 #include "bgzf.h"
-#include "grabix.h"
+#include "kamix.h"
 
 int main (int argc, char **argv)
 {
@@ -18,7 +18,7 @@ int main (int argc, char **argv)
         string sub_command = argv[1];
         if (sub_command == "index")
         {
-            create_grabix_index(bgzf_file);
+            create_kamix_index(bgzf_file);
         }
         else if (sub_command == "grab")
         {
@@ -28,6 +28,10 @@ int main (int argc, char **argv)
                 to_line = atol(argv[4]);
 
             grab(bgzf_file, from_line, to_line);
+        }
+        else if (sub_command == "query")
+        {
+            get_kmer(bgzf_file, argv[3]);
         }
         else if (sub_command == "random")
         {
