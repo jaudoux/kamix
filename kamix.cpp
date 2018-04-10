@@ -239,6 +239,10 @@ int get_kmer(string bgzf_file, char *kmer)
     else break;
   }
 
+  // Print header line
+  printf("%s\n", line->s);
+  status = bgzf_getline(bgzf_fp, '\n', line);
+
   // Find chunk dichotomy-style
   int i = index.chunk_offsets.size() / 2; // Start on the middle
   int min = 0;
