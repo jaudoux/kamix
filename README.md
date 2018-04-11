@@ -44,7 +44,16 @@ kamix size counts-matrix.tsv.gz
 
 ## Create a k-mer matrice with jellyfish and JoinCounts
 
-**Counting and sorting 32-mer with Jellyfish**
+**Counting and sorting 32-mer with DSK or Jellyfish**
+
+* with DSK:
+
+```
+dsk -file sample.fastq.gz
+dsk2ascii -file sample.h5 -out >(sort -k 1) > counts.tsv
+```
+
+* with Jellyfish:
 
 ```
 jellyfish count -m 32 -s 10000 -o sample.jf <(zcat sample.fastq.gz)
