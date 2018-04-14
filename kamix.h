@@ -6,8 +6,6 @@ using namespace std;
 
 #include "bgzf.h"
 
-
-#define VERSION "0.1.8"
 // we only want to store the offset for every 10000th
 // line. otherwise, were we to store the position of every
 // line in the file, the index could become very large for
@@ -25,8 +23,6 @@ struct index_info {
     vector<chunk_t> chunk_offsets;
     uint64_t num_lines;
 };
-
-int usage();
 
 bool bgzf_getline_counting(BGZF * stream);
 
@@ -47,7 +43,9 @@ Extract lines [FROM, TO] from file.
 */
 int grab(string bgzf_file, uint64_t from_line, uint64_t to_line);
 
-int get_kmer(string bgzf_file, char *kmer);
+int kamix_query(string bgzf_file, int argc, char **argv);
+
+int get_kmer(BGZF *bgzf_fp, index_info index, char *kmer, bool print_header = 0);
 
 /*
 Extract K random lines from file using reservoir sampling

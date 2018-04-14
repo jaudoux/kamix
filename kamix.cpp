@@ -10,31 +10,6 @@ using namespace std;
 #include "bgzf.h"
 #include "kamix.h"
 
-int usage()
-{
-  cout << "usage: kamix index bgzf_file " << endl;
-  cout << "       kamix query bgzf_file AAAAAAAAAAGGCTAAACAT " << endl;
-  cout << endl;
-  cout << "examples:" << endl;
-  cout << "       # create a kamix index (big.vcf.gz.gbi)" << endl;
-  cout << "       kamix index big.vcf.gz" << endl;
-  cout << endl;
-  cout << "       # query a k-mer." << endl;
-  cout << "       kamix query big.vcf.gz AAAAAAAAAAGGCTAAACAT " << endl;
-  cout << endl;
-  cout << "       # extract the 100 random lines." << endl;
-  cout << "       kamix random big.vcf.gz 100" << endl;
-  cout << endl;
-  cout << "       # Is the file bgzipped?" << endl;
-  cout << "       kamix check big.vcf.gz" << endl;
-  cout << endl;
-  cout << "       # get total number of lines in the file (minus the header)." << endl;
-  cout << "       kamix size big.vcf.gz" << endl;
-  cout << "version: " << VERSION << "\n";
-  cout << endl;
-  return EXIT_SUCCESS;
-}
-
 /*enum DNA_MAP {A, C, G, T};  // A=1, C=0, T=2, G=3*/
 uint64_t str_to_int(char* str, size_t l)
 {
@@ -204,15 +179,17 @@ void load_index(string bgzf_file, index_info &index)
   index_file.close();
 }
 
-int get_kmer(string bgzf_file, char *kmer)
-{
+int kamix_query(string bgzf_file, int argc, char **argv) {
+
+  if (argc == 0) {
+		fprintf(stderr, "\n");
+		fprintf(stderr, "Usage:   kamix query [options] file:path mers:string+\n\n");
+		return 1;
+  }
+
+  // load the index
   index_info index;
-  //cerr << "Loading index" << endl;
-
   load_index(bgzf_file, index);
-  uint64_t kmer_query = str_to_int(kmer,strlen(kmer));
-
-  // FIXME check that k-mer is <= 32
 
   // load the BGZF file
   BGZF *bgzf_fp = bgzf_open(bgzf_file.c_str(), "r");
@@ -222,16 +199,29 @@ int get_kmer(string bgzf_file, char *kmer)
     exit (1);
   }
 
+  for(int i = 0; i < argc; i++) {
+    //cerr << "counting : " << argv[i] << endl;
+    if(i == 0)
+      get_kmer(bgzf_fp, index, argv[i], 1);
+    else
+      get_kmer(bgzf_fp, index, argv[i], 0);
+  }
+
+  return 1;
+}
+
+int get_kmer(BGZF *bgzf_fp, index_info index, char *kmer, bool print_header)
+{
+  // FIXME check that k-mer is <= 32
+  uint64_t kmer_query = str_to_int(kmer,strlen(kmer));
+
   // dump the header if there is one
   int status;
-  kstring_t *line = new kstring_t;
+  kstring_t *line = (kstring_t*)calloc(1, sizeof(kstring_t));
   char *kmer_tmp;
   uint64_t kmer_int = 0;
-  line->s = (char*)malloc(sizeof(char));
-  line->s[0] = '\0';
-  line->l = 0;
-  line->m = 0;
 
+  // Skip header lines starting with a # character
   while ((status = bgzf_getline(bgzf_fp, '\n', line)) > 0)
   {
     if (line->s[0] == '#')
@@ -240,7 +230,9 @@ int get_kmer(string bgzf_file, char *kmer)
   }
 
   // Print header line
-  printf("%s\n", line->s);
+  if(print_header)
+    printf("%s\n", line->s);
+
   status = bgzf_getline(bgzf_fp, '\n', line);
 
   // Find chunk dichotomy-style
@@ -267,6 +259,7 @@ int get_kmer(string bgzf_file, char *kmer)
   char* tempstr = (char*)malloc(sizeof(char) * 33);
   if(max >= min) {
     bgzf_seek (bgzf_fp, index.chunk_offsets[i].offset, SEEK_SET);
+    // Go to next line while the current k-mer is lower in lexicographic order
     while (kmer_int < kmer_query)
     {
       status = bgzf_getline(bgzf_fp, '\n', line);
@@ -274,6 +267,8 @@ int get_kmer(string bgzf_file, char *kmer)
       kmer_tmp = strtok(tempstr,"\t");
       kmer_int = str_to_int(kmer_tmp,strlen(kmer_tmp));
     }
+    // If we have found the k-mer we print it, otherwise
+    // the queried k-mers is not present in the file
     if(kmer_int == kmer_query) {
       printf("%s\n", line->s);
     } else if(kmer_int > kmer_query) {

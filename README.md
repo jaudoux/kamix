@@ -31,7 +31,10 @@ kamix index counts-matrix.tsv.gz
 # 3. query a k-mer." << endl;
 kamix query counts-matrix.tsv.gz AAAAAAAAAAGGCTAAACAT
 
-# extract the 100 random kmers.
+# Query many k-kmers from a file containing 1-kmer per-line
+cat kmers.txt | xargs kamix query counts-matrix.tsv.gz
+
+# Extract the 100 random kmers.
 kamix random counts-matrix.tsv.gz 100
 
 # Is the file bgzipped?
@@ -73,3 +76,16 @@ joinCounts counts1.tsv counts2.tsv > counts-matrix.tsv
 ## Credit
 
 kamix is derived from [grabix](https://github.com/arq5x/grabix) that uses BGZF library.
+
+## TODO
+Speed-up the random options for large files
+Add a Helper for each sub_command
+Add an option to output JSON in kamix Query
+Add the version of kamix in the index
+Add the k-mer length in the index
+When indexing check if the file is good (same k-length, sorted, same number of samples)
+Check if the index is newer than the files
+Check header line
+Check if the number of samples is the same in all lines
+Make some performances test and adjust chunk size
+In k-mer index add an option to set the chunk size
