@@ -242,6 +242,7 @@ int get_kmer(BGZF *bgzf_fp, index_info index, char *kmer, bool print_header)
 
   //fprintf(stderr, "dichotomy search\n");
   while(max > min) {
+    //cerr << "min: " << min << " max: " << max << " i: " << i << endl;
     // We go up
     if(index.chunk_offsets[i].kmer > kmer_query) {
       max = i - 1;
@@ -260,7 +261,7 @@ int get_kmer(BGZF *bgzf_fp, index_info index, char *kmer, bool print_header)
   if(max >= min) {
     bgzf_seek (bgzf_fp, index.chunk_offsets[i].offset, SEEK_SET);
     // Go to next line while the current k-mer is lower in lexicographic order
-    while (kmer_int < kmer_query)
+    while (kmer_int < kmer_query && status > 0)
     {
       status = bgzf_getline(bgzf_fp, '\n', line);
       strncpy(tempstr, line->s, 32);
@@ -271,7 +272,7 @@ int get_kmer(BGZF *bgzf_fp, index_info index, char *kmer, bool print_header)
     // the queried k-mers is not present in the file
     if(kmer_int == kmer_query) {
       printf("%s\n", line->s);
-    } else if(kmer_int > kmer_query) {
+    } else {
       printf("kmer %s not found\n", kmer);
     }
   }
