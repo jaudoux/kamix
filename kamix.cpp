@@ -221,11 +221,13 @@ int get_kmer(BGZF *bgzf_fp, index_info index, char *kmer, bool print_header)
   char *kmer_tmp;
   uint64_t kmer_int = 0;
 
+  bgzf_seek (bgzf_fp, 0, SEEK_SET);
+
   // Skip header lines starting with a # character
   while ((status = bgzf_getline(bgzf_fp, '\n', line)) > 0)
   {
     if (line->s[0] == '#')
-    printf("%s\n", line->s);
+      printf("%s\n", line->s);
     else break;
   }
 
@@ -273,7 +275,7 @@ int get_kmer(BGZF *bgzf_fp, index_info index, char *kmer, bool print_header)
     if(kmer_int == kmer_query) {
       printf("%s\n", line->s);
     } else {
-      printf("kmer %s not found\n", kmer);
+      printf("%s\tnot_found\n", kmer);
     }
   }
   return 0;
