@@ -28,19 +28,22 @@ bgzip counts-matrix.tsv
 # 2. create a kamix index (big.vcf.gz.gbi)
 kamix index counts-matrix.tsv.gz
 
-# 3. query a k-mer." << endl;
+# 3. Query a k-mer
 kamix query counts-matrix.tsv.gz AAAAAAAAAAGGCTAAACAT
+
+# 4. query a sequence (that will be splitted into k-mers)
+kamix query counts-matrix.tsv.gz TGCTGAGCTGGATCGAAACGCTAGCCCCATGTAAAAAGGCTAAACAT
 
 # Query many k-kmers from a file containing 1-kmer per-line
 cat kmers.txt | xargs kamix query counts-matrix.tsv.gz
 
-# Extract the 100 random kmers.
+# Extract the 100 random kmers
 kamix random counts-matrix.tsv.gz 100
 
 # Is the file bgzipped?
 kamix check counts-matrix.tsv.gz
 
-# get total number of lines in the file (minus the header).
+# get total number of lines in the file (minus the header)
 kamix size counts-matrix.tsv.gz
 ```
 
@@ -78,14 +81,16 @@ joinCounts counts1.tsv counts2.tsv > counts-matrix.tsv
 kamix is derived from [grabix](https://github.com/arq5x/grabix) that uses BGZF library.
 
 ## TODO
-Speed-up the random options for large files
-Add a Helper for each sub_command
-Add an option to output JSON in kamix Query
-Add the version of kamix in the index
-Add the k-mer length in the index
-When indexing check if the file is good (same k-length, sorted, same number of samples)
-Check if the index is newer than the files
-Check header line
-Check if the number of samples is the same in all lines
-Make some performances test and adjust chunk size
-In k-mer index add an option to set the chunk size
+- Speed-up the random options for large files
+- Add a Helper for each sub_command
+- Add an option to output JSON in kamix Query
+- Add the version of kamix in the index
+- Add the k-mer length in the index
+- When indexing check if the file is good (same k-length, sorted, same number of samples)
+- Check if the index is newer than the files
+- Check header line
+- Check if the number of samples is the same in all lines
+- Make some performances test and adjust chunk size
+- In k-mer index add an option to set the chunk size
+- Add an option in query to use canonical representation
+- Add a subcommand, that split a sequence into k-mers and query them

@@ -38,20 +38,15 @@ int main (int argc, char **argv)
 
         if (sub_command == "index")
         {
-            create_kamix_index(bgzf_file);
-        }
-        else if (sub_command == "grab")
-        {
-            int64_t from_line = atol(argv[3]);
-            int64_t to_line = from_line;
-            if (argc == 5)
-                to_line = atol(argv[4]);
-
-            grab(bgzf_file, from_line, to_line);
+            create_kamix_index(bgzf_file, argc-2, argv+2);
         }
         else if (sub_command == "query")
         {
-            kamix_query(bgzf_file, argc-3, argv+3);
+            kamix_query(bgzf_file, argc-2, argv+2);
+        }
+				else if (sub_command == "k")
+        {
+            cout << "k =  " << get_kmer_length(bgzf_file) << endl;
         }
         else if (sub_command == "random")
         {

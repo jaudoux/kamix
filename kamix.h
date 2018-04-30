@@ -10,7 +10,7 @@ using namespace std;
 // line. otherwise, were we to store the position of every
 // line in the file, the index could become very large for
 // files with many records.
-#define CHUNK_SIZE 10000
+#define CHUNK_SIZE 4096
 #define KMER_LENGTH 32
 
 typedef struct {
@@ -30,7 +30,7 @@ bool bgzf_getline_counting(BGZF * stream);
 Create a gbi index for the file to facilitate
 random access via the BGZF seek utility
 */
-int create_kamix_index(string bgzf_file);
+int create_kamix_index(string bgzf_file, int argc, char **argv);
 
 /*
 Load an existing gbi index for the file to facilitate
@@ -38,14 +38,12 @@ random access via the BGZF seek utility
 */
 void load_index(string bgzf_file, index_info &index);
 
-/*
-Extract lines [FROM, TO] from file.
-*/
-int grab(string bgzf_file, uint64_t from_line, uint64_t to_line);
 
 int kamix_query(string bgzf_file, int argc, char **argv);
 
-int get_kmer(BGZF *bgzf_fp, index_info index, char *kmer, bool print_header = 0);
+int get_kmer(BGZF *bgzf_fp, index_info index, uint64_t kmer_query, bool print_header = 0);
+
+int get_kmer_length(string bgzf_file);
 
 /*
 Extract K random lines from file using reservoir sampling
